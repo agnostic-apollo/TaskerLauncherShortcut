@@ -1,0 +1,2 @@
+include ':app', ':annotationLib', ':assertionLib', ':pluginApiLib', ':pluginClientSdkLib', ':pluginHostSdkLib', ':spackleLib', ':testLib'
+rootProject.name='TaskerLauncherShortcut'

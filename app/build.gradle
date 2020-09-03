@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+
+// Load keystore.properties file that contains info of the signing key for release build apks
+// The keystore.properties file should exist in the root directory of the project (not app directory)
+// It must have the following 4 values in the format:
+// storeFile=<path to store keystore.jks>
+// storePassword=<store password>
+// keyAlias=<key alias>
+// keyPassword=<key password>
+// Remove the following keystoreProperties* lines, signingConfigs release section and signingConfig line in 
+// buildTypes release section below if you do not want to sign with your own special key and want to use defaults
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "com.agnostic.apollo.taskerlaunchershortcut"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "androidx.annotation:annotation:1.1.0"
+
+    implementation group:'net.jcip', name:'jcip-annotations', version:"1.0"
+
+    // Import com.twofortyfouram locale plugin library directories stored in root directory of project for targetSdkVersion 29
+    implementation project(':annotationLib')
+    implementation project(':assertionLib')
+    implementation project(':pluginApiLib')
+    implementation project(':pluginClientSdkLib')
+    implementation project(':pluginHostSdkLib')
+    implementation project(':spackleLib')
+    //androidTestImplementation project(':testLib')
+
+    // Import com.twofortyfouram locale plugin libraries from official repository for targetSdkVersion 25
+    //implementation group:'com.twofortyfouram', name:'android-annotation', version:'[3.0.0,4.0['
+    //implementation group:'com.twofortyfouram', name:'android-assertion', version:'[2.0.0,3.0)'
+    //implementation group:'com.twofortyfouram', name:'android-plugin-api-for-locale', version:'[1.0.2,2.0['
+    //implementation group:'com.twofortyfouram', name:'android-plugin-client-sdk-for-locale', version:'[4.0.3, 5.0['
+    //implementation group:'com.twofortyfouram', name:'android-plugin-host-sdk-for-locale', version:'[2.0.3,3.0['
+    //implementation group:'com.twofortyfouram', name:'android-spackle', version:'[2.0.0,4.0['
+    //androidTestImplementation group:'com.twofortyfouram', name:'android-test', version:'[6.0.1,7.0)'
+}

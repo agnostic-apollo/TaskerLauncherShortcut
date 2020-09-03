@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">TaskerLauncherShortcut</string>
+
+    <!-- Name of the plug-in that appears in Locale -->
+    <string name="plugin_name">TaskerLauncherShortcut</string>
+
+    <!-- Hint text in the toast edit text -->
+    <string name="message_hint">Shortcut Intent Uri</string>
+
+    <!-- Discard menu item -->
+    <string name="menu_discard_changes">Discard changes</string>
+    <string name="hello">hello!</string>
+    <string name="change_launcher">Change Launcher</string>
+
+    <string name="search">Search</string>
+    <string name="clear_search">Clear Search</string>
+    <string name="no_apps">There are no apps</string>
+    <string name="app_icon">App Icon</string>
+    <string name="search_shortcuts">Search Shortcuts</string>
+    <string name="no_shortcuts">No Shortcuts</string>
+    <string name="shortcut_chooser">Shortcut Chooser</string>
+    <string name="shortcut_icon">Shortcut Icon</string>
+    <string name="shortcut_label">Shortcut Label</string>
+    <string name="app_label">App Label</string>
+
+    <plurals name="subtitle_apps_plural">
+        <item quantity="one">%1$s app</item>
+        <item quantity="other">%1$s apps</item>
+    </plurals>
+    <plurals name="subtitle_shortcuts_plural">
+        <item quantity="one">%1$s shortcut</item>
+        <item quantity="other">%1$s shortcuts</item>
+    </plurals>
+</resources>

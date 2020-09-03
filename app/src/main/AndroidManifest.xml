@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Because plug-ins interact with the host in the background, plug-ins MUST be installed to
+     internal memory. This is consistent with Google's app install location guidelines:
+     <http://developer.android.com/guide/appendix/install-location.html#Should>.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.agnostic.apollo.taskerlaunchershortcut"
+    android:installLocation="internalOnly">
+
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+    <!-- This allows the plug-in to appear on non-touchscreen devices like Google TV.
+    Be sure to test that the app works without a touchscreen. -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false"/>
+
+    <!-- Although many of these default to true, some users with modified ROMs have
+         trouble seeing apps unless these attributes are explicitly set. -->
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" tools:ignore="UnusedAttribute"/>
+
+    <!-- When hardware acceleration is enabled, the RAM memory usage of the app is
+         significantly increased as soon as any UI is displayed. To reduce the memory
+         usage of a plug-in which is primarily a background app, either (1) hardware
+         acceleration should be disabled or (2) the plug-in's BroadcastReceiver (and any
+         applicable Service) should be put into a different process. This example plug-in
+         creates two processes. -->
+    <application
+        android:name="com.agnostic.apollo.taskerlaunchershortcut.PluginApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="true">
+
+        <activity
+            android:name="com.agnostic.apollo.taskerlaunchershortcut.ui.activity.EditActivity"
+            android:exported="false"
+            android:label="@string/plugin_name"
+            android:theme="@style/Theme.AppCompat"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="UnusedAttribute">
+        </activity>
+        <!--
+             This is the "edit" Activity. Note that the host will reject plug-in
+             Activities for the following reasons:
+                 - Missing "android:label=[...]"
+                 - Missing "android:icon=[...]"
+                 - The Activity isn't exported (e.g. android:exported="false")
+                 - The Activity isn't enabled (e.g. android:enabled="false")
+                 - The Activity requires permissions not available to the host
+        -->
+        <activity-alias
+            android:name="com.agnostic.apollo.taskerlaunchershortcut.ui.activity.PluginActivity"
+            android:exported="true"
+            android:roundIcon="@mipmap/ic_plugin"
+            android:label="@string/plugin_name"
+            android:targetActivity="com.agnostic.apollo.taskerlaunchershortcut.ui.activity.EditActivity"
+            tools:ignore="ExportedActivity">
+            <!-- this Intent filter allows the plug-in to be discovered by the host. -->
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"/>
+            </intent-filter>
+        </activity-alias>
+
+        <!--
+             If this plug-in does not stand alone (e.g. it is only a plug-in for Locale and does not
+             have a Launcher Activity), including this in the manifest will help when users try to
+             open the app directly from the app store.
+        -->
+
+        <activity
+            android:name=".ShortcutChooserActivity"
+            android:label="@string/shortcut_chooser"
+            android:taskAffinity=".ShortcutChooserActivity" >
+        </activity>
+
+        <activity
+            android:name=".LauncherHomeActivity"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:label="@string/app_name">
+            <!-- android:noHistory="true" -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".FakeLauncherHome"  android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Intent receiver used to install legacy shortcuts from other applications on Android < 8 -->
+        <receiver
+            android:name=".shortcuts.InstallShortcutReceiver"
+            android:permission="com.android.launcher.permission.INSTALL_SHORTCUT">
+            <intent-filter>
+                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Activity to process pin shortcuts requests from other applications on Android >= 8 -->
+        <activity android:name=".shortcuts.PinShortcutReceiver"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.content.pm.action.CONFIRM_PIN_SHORTCUT" />
+                <!--<action android:name="android.content.pm.action.CONFIRM_PIN_APPWIDGET" /> -->
+            </intent-filter>
+        </activity>
+
+<!--
+
+<activity
+    android:name="com.twofortyfouram.locale.sdk.client.ui.activity.InfoActivity"
+    android:exported="true"
+    tools:ignore="ExportedActivity">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+
+        <category android:name="android.intent.category.INFO"/>
+    </intent-filter>
+</activity>
+
+     This is the "fire" BroadcastReceiver. Note that the host will reject plug-in
+     BroadcastReceivers for the following reasons:
+        - The BroadcastReceiver isn't exported (e.g. android:exported="false")
+        - The BroadcastReceiver isn't enabled (e.g. android:enabled="false")
+        - The BroadcastReceiver requires permissions not available to the host
+        - There are multiple BroadcastReceivers for com.twofortyfouram.locale.intent.action.FIRE_SETTING
+-->
+        <receiver
+            android:name="com.agnostic.apollo.taskerlaunchershortcut.receiver.FireReceiver"
+            android:exported="true"
+            android:process=":background"
+            tools:ignore="ExportedReceiver">
+
+            <!-- this Intent filter allows the plug-in to discovered by the host. -->
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING"/>
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>
